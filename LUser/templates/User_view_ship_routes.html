@@ -1,0 +1,67 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block main %}
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="row g-0">
+
+            <!-- Ship Image -->
+            <div class="col-md-4">
+                {% if ship.image %}
+                    <img src="{{ ship.image.url }}"
+                         class="img-fluid rounded-start"
+                         style="height: 100%; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'assets/img/ship-placeholder.jpg' %}"
+                         class="img-fluid rounded-start">
+                {% endif %}
+            </div>
+
+            <!-- Ship Details -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h4>{{ ship.ship_name }}</h4>
+                    <p class="mb-1">
+                        <strong>Company:</strong> {{ company.name }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>Capacity:</strong> {{ ship.capacity_ton }} Tons
+                    </p>
+                    <p class="mb-0">
+                        <strong>Built Year:</strong> {{ ship.built_year }}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <h5>Available Routes</h5>
+
+    {% if routes %}
+        {% for r in routes %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <p>
+                    <strong>Route:</strong> {{ r.route_id }} <br>
+                    <strong>Start Date:</strong> {{ r.start_date }} <br>
+                    <strong>Arrival Date:</strong> {{ r.arrival_date }}
+                </p>
+
+                <a href="{% url 'LUser:send_transportation_request' r.ship_route_id %}"
+                   class="btn btn-primary btn-sm">
+                   Select Route
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No routes available for this ship.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

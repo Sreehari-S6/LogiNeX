@@ -1,0 +1,172 @@
+{% extends "admin_indexnav.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+<!-- HEADER -->
+<div class="row mb-4">
+<div class="col-12">
+<h3>Admin Dashboard</h3>
+<p class="text-muted">Live logistics system overview</p>
+</div>
+</div>
+
+<!-- STATS -->
+<div class="row mb-4">
+
+<div class="col-md-3">
+<div class="card p-3 shadow-sm">
+<h6>Pending Companies</h6>
+<h3>{{ pending_companies }}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3 shadow-sm">
+<h6>Total Ships</h6>
+<h3>{{ total_ships }}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3 shadow-sm">
+<h6>Total Routes</h6>
+<h3>{{ total_routes }}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3 shadow-sm">
+<h6>Total Users</h6>
+<h3>{{ total_users }}</h3>
+</div>
+</div>
+
+</div>
+
+<!-- TABLES -->
+<div class="row">
+
+<!-- Pending Companies -->
+<div class="col-md-6 mb-4">
+<div class="card shadow-sm">
+<div class="card-header">Pending Companies</div>
+
+<table class="table mb-0">
+<thead>
+<tr>
+<th>Name</th>
+<th>Owner</th>
+<th>District</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for c in pending_company_list %}
+<tr>
+<td>{{ c.name }}</td>
+<td>{{ c.owner_name }}</td>
+<td>{{ c.district }}</td>
+
+<td>
+<form method="post" action="{% url 'LAdmin:update_company_status' %}">
+{% csrf_token %}
+<input type="hidden" name="company_id" value="{{ c.id }}">
+<button name="status" value="Approved" class="btn btn-success btn-sm">Approve</button>
+<button name="status" value="Rejected" class="btn btn-danger btn-sm">Reject</button>
+</form>
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="4">No pending companies</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+</div>
+
+
+<!-- Ships -->
+<div class="col-md-6 mb-4">
+<div class="card shadow-sm">
+<div class="card-header">Recent Ships</div>
+
+<table class="table mb-0">
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Company</th>
+<th>Capacity</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody>
+{% for s in ships %}
+<tr>
+<td>{{ s.ship_id }}</td>
+<td>{{ s.ship_name }}</td>
+<td>{{ s.company_id.name }}</td>
+<td>{{ s.capacity_ton }}</td>
+<td>{{ s.status }}</td>
+</tr>
+{% empty %}
+<tr><td colspan="5">No ships found</td></tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+</div>
+
+</div>
+
+
+<!-- CHARTS -->
+<div class="row">
+<div class="col-md-6">
+<canvas id="pieChart"></canvas>
+</div>
+
+<div class="col-md-6">
+<canvas id="barChart"></canvas>
+</div>
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+new Chart(document.getElementById('pieChart'), {
+type: 'pie',
+data: {
+labels: {{ company_status_labels|safe }},
+datasets: [{
+data: {{ company_status_values|safe }},
+backgroundColor: ['orange','blue']
+}]
+}
+});
+
+new Chart(document.getElementById('barChart'), {
+type: 'bar',
+data: {
+labels: {{ route_labels|safe }},
+datasets: [{
+label: "Routes",
+data: {{ route_values|safe }}
+}]
+},
+options: { scales: { y: { beginAtZero:true } } }
+});
+
+</script>
+
+{% endblock %}

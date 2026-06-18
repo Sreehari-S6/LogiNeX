@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipNex+ Admin - {% block title %}Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --dark-orange: #E55A2B;
+            --light-orange: #FF8B5C;
+            --primary-blue: #1E3A8A;
+            --secondary-blue: #3B82F6;
+            --light-blue: #93C5FD;
+            --gray-bg: #F8FAFC;
+            --sidebar-width: 260px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray-bg);
+            overflow-x: hidden;
+        }
+        
+        /* Topbar Styles */
+        .topbar {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            height: 70px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            z-index: 1000;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .topbar-search {
+            width: 300px;
+            border: 2px solid #E2E8F0;
+            border-radius: 25px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+        
+        .topbar-search:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary-orange);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #1D4ED8 100%);
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            padding-top: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 25px 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-brand span {
+            color: var(--primary-orange);
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-orange);
+        }
+        
+        .nav-link i {
+            font-size: 18px;
+            width: 24px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: 70px;
+            padding: 30px;
+            min-height: calc(100vh - 70px);
+        }
+        
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid var(--primary-blue);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card.orange {
+            border-top-color: var(--primary-orange);
+        }
+        
+        .stat-card.blue {
+            border-top-color: var(--secondary-blue);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-icon.orange {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-orange);
+        }
+        
+        .stat-icon.blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-blue);
+        }
+        
+        .card-title {
+            color: #64748B;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .card-value {
+            color: #1E293B;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        /* Tables */
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-header {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Buttons */
+        .btn-orange {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: white;
+        }
+        
+        .btn-orange:hover {
+            background-color: var(--dark-orange);
+            border-color: var(--dark-orange);
+            color: white;
+        }
+        
+        .btn-blue {
+            background-color: var(--secondary-blue);
+            border-color: var(--secondary-blue);
+            color: white;
+        }
+        
+        .btn-blue:hover {
+            background-color: #2563EB;
+            border-color: #2563EB;
+            color: white;
+        }
+        
+        /* Badges */
+        .badge-pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        
+        .badge-approved {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        
+        .badge-rejected {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .topbar {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+        
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            color: var(--primary-blue);
+            cursor: pointer;
+        }
+    </style>
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-truck"></i>
+            Ship<span>Nex</span>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'LAdmin:admin_dashboard' %}">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'LAdmin:view_companies' %}">
+                    <i class="bi bi-building-check"></i>
+                    Approve Companies
+                </a>
+            </li>
+          <li class="nav-item">
+                <a class="nav-link" href="{% url 'LAdmin:view_users' %}">
+                    <i class="bi bi-people"></i>
+                    View Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'LAdmin:view_ships' %}">
+                    <i class="bi bi-ship"></i>
+                    Ship Details
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'LAdmin:manage_routes' %}">
+                    <i class="bi bi-signpost-split"></i>
+                    Route Details
+                </a>
+            </li>
+           
+            <li class="nav-item">
+    <a class="nav-link {% if active_page == 'reviews' %}active{% endif %}"
+       href="{% url 'LAdmin:view_all_reviews' %}">
+        <i class="bi bi-star"></i>
+        Reviews & Feedback
+    </a>
+</li>
+
+
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="{#' %}">
+                    <i class="bi bi-gear"></i>
+                    Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="d-flex align-items-center gap-3">
+            <div class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </div>
+            <div class="search-box">
+                <input type="text" class="form-control topbar-search" placeholder="Search shipments, users, companies...">
+            </div>
+        </div>
+        
+      
+            
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" 
+                   data-bs-toggle="dropdown">
+                    <div class="me-2">
+                        <div style="width: 40px; height: 40px; background: var(--primary-orange); 
+                             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                             color: white; font-weight: 600;">AJ</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">ShipNeX ADMIN </div>
+                        <small class="text-muted"></small>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Edit Profile</a></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        {% block main %}
+        {% endblock %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Active nav link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (currentPath.includes(linkPath) && linkPath !== '#') {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

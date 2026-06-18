@@ -1,0 +1,78 @@
+{% extends "admin_indexnav.html" %}
+{% block title %}View Ships{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <h3 class="mb-3">
+        All Ships ({{ total_ships }})
+    </h3>
+
+    <!-- Ship Cards -->
+    <div class="row g-4">
+
+        {% for ship in ships %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm">
+
+                <!-- Ship Image -->
+                {% if ship.image %}
+                <img src="{{ ship.image.url }}"
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover;"
+                     alt="Ship Image">
+                {% else %}
+                <div class="d-flex align-items-center justify-content-center bg-light"
+                     style="height:180px;">
+                    <span class="text-muted">No Image</span>
+                </div>
+                {% endif %}
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <h5 class="card-title mb-1">
+                        {{ ship.ship_name }}
+                    </h5>
+
+                    <p class="mb-1 text-muted">
+                        <strong>Company:</strong> {{ ship.company_id.name }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Capacity:</strong> {{ ship.capacity_ton }} Ton
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Built Year:</strong> {{ ship.built_year }}
+                    </p>
+
+                    <!-- Status -->
+                    <span class="badge 
+                        {% if ship.status == 'Good' %}
+                            bg-success
+                        {% elif ship.status == 'Inactive' %}
+                            bg-danger
+                        {% else %}
+                            bg-secondary
+                        {% endif %}
+                    ">
+                        {{ ship.status }}
+                    </span>
+                </div>
+
+                <!-- Footer Actions -->
+                
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No ships found</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block main %}
+
+<div class="container py-5">
+
+    <!-- SUCCESS HEADER -->
+    <div class="text-center mb-4">
+        <h2 class="text-success fw-bold">
+            ✅ Payment Successful
+        </h2>
+        <p class="text-muted">Your shipping fee payment is completed</p>
+    </div>
+
+    <!-- INVOICE CARD -->
+    <div class="card shadow-lg rounded-4 p-4" id="invoiceArea">
+
+        <!-- Invoice Top -->
+        <div class="row mb-4">
+            <div class="col">
+                <h4 class="fw-bold text-primary">Shipping Invoice</h4>
+            </div>
+
+            <div class="col text-end">
+                <div><strong>Invoice No:</strong> {{ invoice_no }}</div>
+                <div><strong>Date:</strong> {{ paid_date|date:"d M Y H:i" }}</div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Customer -->
+        <div class="mb-3">
+            <strong>Cargo Booked By:</strong> {{ r.user_id.name }}
+        </div>
+
+        <!-- DETAILS TABLE -->
+        <table class="table table-bordered align-middle">
+
+            <tr>
+                <th width="40%">Company</th>
+                <td>{{ r.company_id.name }}</td>
+            </tr>
+
+            <tr>
+                <th>Ship Name</th>
+                <td>{{ r.ship_id.ship_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Ship Route</th>
+                <td>{{ r.route_id }}</td>
+            </tr>
+
+            <tr>
+                <th>Container Type</th>
+                <td>{{ r.container_type }}</td>
+            </tr>
+
+            <tr>
+                <th>Weight</th>
+                <td>{{ r.weight_ton }} Ton</td>
+            </tr>
+
+            <tr class="table-success">
+                <th>Total Amount Paid</th>
+                <td class="fw-bold fs-5">
+                    ₹ {{ r.amount }}
+                </td>
+            </tr>
+
+        </table>
+
+        <!-- Footer -->
+        <div class="text-center mt-4 text-muted">
+            Thank you for choosing our shipping service
+        </div>
+
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="text-center mt-4">
+        <button onclick="downloadInvoice()" class="btn btn-primary btn-lg">
+            ⬇ Download Invoice
+        </button>
+
+        <a href="{% url 'LUser:user_dashboard' %}"
+           class="btn btn-outline-secondary btn-lg ms-2">
+           Back to Dashboard
+        </a>
+    </div>
+
+</div>
+
+<!-- PRINT / DOWNLOAD SCRIPT -->
+<script>
+function downloadInvoice() {
+    window.print();
+}
+</script>
+
+<style>
+@media print {
+
+    body * {
+        visibility: hidden;
+    }
+
+    #invoiceArea, #invoiceArea * {
+        visibility: visible;
+    }
+
+    #invoiceArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+}
+</style>
+
+{% endblock %}

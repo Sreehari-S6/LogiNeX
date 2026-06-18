@@ -1,0 +1,106 @@
+{% extends "admin_indexnav.html" %}
+{% block title %}All Reviews{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- ================= USER REVIEWS ================= -->
+
+    <h3 class="mb-3">
+        User Reviews to Companies ({{ total_user_reviews }})
+    </h3>
+
+    <div class="row g-4 mb-5">
+
+        {% for r in user_reviews %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="fw-bold">
+                        👤 {{ r.user_id.name }}
+                    </h6>
+
+                    <p class="mb-1 text-muted">
+                        <strong>Company:</strong>
+                        {{ r.request_id.company_id.name }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Ship:</strong>
+                        {{ r.request_id.ship_id.ship_name }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Route:</strong>
+                        {{ r.request_id.route_id.departure_port }}
+                        →
+                        {{ r.request_id.route_id.arrival_port }}
+                    </p>
+
+                    <div class="border rounded p-2 bg-light">
+                        "{{ r.comment }}"
+                    </div>
+
+                    <small class="text-muted">
+                        {{ r.date|date:"M d, Y" }}
+                    </small>
+
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No user reviews found</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- ================= COMPANY FEEDBACK ================= -->
+
+    <h3 class="mb-3">
+        Company Feedback to Admin ({{ total_feedbacks }})
+    </h3>
+
+    <div class="row g-4">
+
+        {% for f in company_feedbacks %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="fw-bold">
+                        🏢 {{ f.name }}
+                    </h6>
+
+                    <p class="mb-1 text-muted">
+                        {{ f.email }}
+                    </p>
+
+                    <p class="mb-2">
+                        📞 {{ f.contact_no }}
+                    </p>
+
+                    <div class="border rounded p-2 bg-light">
+                        {{ f.message }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No company feedback found</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

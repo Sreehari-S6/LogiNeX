@@ -1,0 +1,82 @@
+{% extends "company_navbar.html" %}
+{% block title %}User Reviews{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="h2 text-yellow mb-2">Customer Reviews</h1>
+        <p class="text-gray">Feedback from users on completed shipments</p>
+    </div>
+
+    <!-- Review Cards -->
+    <div class="row g-4">
+
+        {% for r in reviews %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+
+            <div class="card h-100 shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <!-- User -->
+                    <h6 class="fw-bold text-yellow">
+                        <i class="bi bi-person-circle"></i>
+                        {{ r.user_id.name }}
+                    </h6>
+
+                    <!-- Ship -->
+                    <p class="mb-1 text-gray">
+                        <strong>Ship:</strong>
+                        {{ r.request_id.ship_id.ship_name }}
+                    </p>
+
+                    <!-- Route -->
+                    <p class="mb-1 text-gray">
+                        <strong>Route:</strong>
+                        {{ r.request_id.route_id.departure_port }}
+                        →
+                        {{ r.request_id.route_id.arrival_port }}
+                    </p>
+
+                    <!-- Cargo -->
+                    <p class="mb-1 text-gray">
+                        <strong>Container:</strong>
+                        {{ r.request_id.container_type }}
+                    </p>
+
+                    <p class="mb-2 text-gray">
+                        <strong>Weight:</strong>
+                        {{ r.request_id.weight_ton }} ton
+                    </p>
+
+                    <hr>
+
+                    <!-- Review -->
+                    <p class="mb-2">
+                        "{{ r.comment }}"
+                    </p>
+
+                    <small class="text-muted">
+                        {{ r.date|date:"M d, Y" }}
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">
+                No reviews received yet
+            </p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

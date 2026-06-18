@@ -1,0 +1,669 @@
+{% extends "indexnav.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block style %}
+<style>
+    .register-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 40px 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .register-logo {
+        color: #0d6efd;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    .register-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 10;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    .password-container {
+        position: relative;
+    }
+    .password-strength {
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    .password-strength.weak {
+        color: #dc3545;
+    }
+    .password-strength.medium {
+        color: #ffc107;
+    }
+    .password-strength.strong {
+        color: #198754;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .required-field label:after {
+        content: " *";
+        color: #dc3545;
+    }
+    .asteriskField {
+        color: #dc3545;
+    }
+    .validation-message {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+    .validation-message.valid {
+        color: #198754;
+    }
+    .validation-message.invalid {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5" style="margin-bottom: 6rem;">
+        <div class="container py-5">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Create Your Account</h1>
+            <nav aria-label="breadcrumb animated slideInDown">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a class="text-white" href="{% url 'index' %}">Home</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Register</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Register Form Start -->
+    <div class="container-fluid overflow-hidden py-5 px-lg-0">
+        <div class="container py-5 px-lg-0">
+            <div class="row g-5 mx-lg-0 justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="register-container wow fadeIn" data-wow-delay="0.1s">
+                        <div class="register-header">
+                            <div class="register-logo">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h1 class="mb-2">Join Our Shipping Community</h1>
+                            <p class="text-secondary">Create an account to start managing your shipments efficiently</p>
+                        </div>
+                        
+                        {% if messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="POST" action="{% url 'register' %}" id="registerForm" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Custom form rendering for better control -->
+                            <div class="row g-3">
+                                <!-- Name Field -->
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" 
+                                               class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+                                               id="id_name" 
+                                               name="name" 
+                                               placeholder="John Doe" 
+                                               value="{{ form.name.value|default:'' }}"
+                                               required
+                                               pattern="^[A-Za-z][A-Za-z\s]*$"
+                                               title="Name must start with an alphabet and can only contain letters and spaces">
+                                        <label for="id_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                        {% if form.name.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="validation-message mt-1" id="nameValidation">
+                                            <small>Name must start with an alphabet</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Email Field -->
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" 
+                                               class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                               id="id_email" 
+                                               name="email" 
+                                               placeholder="name@example.com" 
+                                               value="{{ form.email.value|default:'' }}"
+                                               required>
+                                        <label for="id_email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Phone Field -->
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="tel" 
+                                               class="form-control {% if form.phone.errors %}is-invalid{% endif %}" 
+                                               id="id_phno" 
+                                               name="phno" 
+                                               placeholder="1234567890" 
+                                               value="{{ form.phone.value|default:'' }}"
+                                               required
+                                               pattern="\d{10}"
+                                               title="Enter exactly 10 digits"
+                                               maxlength="10">
+                                        <label for="id_phno" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                        {% if form.phone.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.phone.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="validation-message mt-1" id="phoneValidation">
+                                            <small>Enter exactly 10 digits</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Password Field -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="password-container">
+                                            <div class="form-floating">
+                                                <input type="password" 
+                                                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                                       id="id_password" 
+                                                       name="password" 
+                                                       placeholder="Password" 
+                                                       required
+                                                       minlength="8">
+                                                <label for="id_password" class="form-label">Password <span class="text-danger">*</span></label>
+                                            </div>
+                                            
+                                        </div>
+                                        {% if form.password.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="password-strength mt-2" id="passwordStrength"></div>
+                                        <div class="validation-message mt-1" id="passwordValidation">
+                                            <small>Minimum 8 characters required</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Confirm Password Field -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="password-container">
+                                            <div class="form-floating">
+                                                <input type="password" 
+                                                       class="form-control {% if form.confirm_password.errors %}is-invalid{% endif %}" 
+                                                       id="id_confirm_password" 
+                                                       name="confirm_password" 
+                                                       placeholder="Confirm Password" 
+                                                       required
+                                                       minlength="8">
+                                                <label for="id_confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                            </div>
+                                            
+                                        </div>
+                                        {% if form.confirm_password.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.confirm_password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <div class="text-danger mt-2" id="passwordMatchError" style="display: none; font-size: 0.85rem;">
+                                            Passwords do not match
+                                        </div>
+                                        <div class="validation-message mt-1" id="confirmPasswordValidation">
+                                            <small>Re-enter your password</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Country Field -->
+<div class="col-md-6">
+    <div class="form-floating mb-3">
+        <input type="text" 
+               class="form-control {% if form.country.errors %}is-invalid{% endif %}" 
+               id="id_country" 
+               name="country" 
+               placeholder="Country" 
+               value="{{ form.country.value|default:'' }}"
+               required>
+        <label for="id_country" class="form-label">Country <span class="text-danger">*</span></label>
+        {% if form.country.errors %}
+            <div class="invalid-feedback">
+                {% for error in form.country.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ID Proof Field -->
+<div class="col-md-6">
+    <div class="form-floating mb-3">
+        <input type="text" 
+               class="form-control {% if form.id_proof.errors %}is-invalid{% endif %}" 
+               id="id_id_proof" 
+               name="id_proof" 
+               placeholder="ID Proof Number" 
+               value="{{ form.id_proof.value|default:'' }}"
+               required>
+        <label for="id_id_proof" class="form-label">ID Proof Number <span class="text-danger">*</span></label>
+        {% if form.id_proof.errors %}
+            <div class="invalid-feedback">
+                {% for error in form.id_proof.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+                                <!-- Terms and Conditions -->
+                                <div class="col-12">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input {% if form.terms.errors %}is-invalid{% endif %}" 
+                                               type="checkbox" 
+                                               id="id_terms" 
+                                               name="terms"
+                                               required>
+                                        <label class="form-check-label" for="id_terms">
+                                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a> <span class="text-danger">*</span>
+                                        </label>
+                                        {% if form.terms.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.terms.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <!-- Submit Button -->
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100 py-3" type="submit" id="submitBtn">
+                                        <i class="fas fa-user-plus me-2"></i>Create Account
+                                    </button>
+                                </div>
+                                
+                                <!-- Login Link -->
+                                <div class="col-12">
+                                    <div class="text-center pt-3">
+                                        <p class="mb-0">Already have an account? 
+                                            <a href="{% url 'login' %}" class="text-primary fw-bold">Sign in here</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div class="register-footer mt-4">
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-lock me-1"></i>
+                                Your information is secured with 256-bit SSL encryption
+                            </p>
+                            <p class="text-muted mt-2">
+                                <small>By registering, you agree to our 
+                                    <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                    <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Register Form End -->
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password toggle functionality
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('id_password');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const confirmPasswordInput = document.getElementById('id_confirm_password');
+        
+        // Toggle main password visibility
+        if (passwordToggle && passwordInput) {
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                const icon = passwordToggle.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Toggle confirm password visibility
+        if (confirmPasswordToggle && confirmPasswordInput) {
+            confirmPasswordToggle.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                const icon = confirmPasswordToggle.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Name validation - must start with alphabet
+        const nameInput = document.getElementById('id_name');
+        const nameValidation = document.getElementById('nameValidation');
+        
+        if (nameInput && nameValidation) {
+            nameInput.addEventListener('input', function() {
+                const name = nameInput.value.trim();
+                const namePattern = /^[A-Za-z][A-Za-z\s]*$/;
+                
+                if (name.length === 0) {
+                    nameValidation.innerHTML = '<small class="text-muted">Name must start with an alphabet</small>';
+                    nameValidation.className = 'validation-message';
+                } else if (namePattern.test(name)) {
+                    nameValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Valid name format</small>';
+                    nameValidation.className = 'validation-message valid';
+                } else {
+                    nameValidation.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>Name must start with alphabet and contain only letters/spaces</small>';
+                    nameValidation.className = 'validation-message invalid';
+                }
+            });
+        }
+        
+        // Phone validation - exactly 10 digits
+        const phoneInput = document.getElementById('id_phno');
+        const phoneValidation = document.getElementById('phoneValidation');
+        
+        if (phoneInput && phoneValidation) {
+            phoneInput.addEventListener('input', function() {
+                const phone = phoneInput.value.replace(/\D/g, ''); // Remove non-digits
+                phoneInput.value = phone; // Keep only digits
+                
+                if (phone.length === 0) {
+                    phoneValidation.innerHTML = '<small class="text-muted">Enter exactly 10 digits</small>';
+                    phoneValidation.className = 'validation-message';
+                } else if (phone.length === 10) {
+                    phoneValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Valid phone number (10 digits)</small>';
+                    phoneValidation.className = 'validation-message valid';
+                } else if (phone.length < 10) {
+                    phoneValidation.innerHTML = `<small class="text-warning"><i class="fas fa-exclamation-circle me-1"></i>${phone.length}/10 digits entered</small>`;
+                    phoneValidation.className = 'validation-message invalid';
+                } else {
+                    phoneValidation.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>Phone number must be exactly 10 digits</small>';
+                    phoneValidation.className = 'validation-message invalid';
+                    phoneInput.value = phone.substring(0, 10); // Limit to 10 digits
+                }
+            });
+        }
+        
+        // Password strength indicator
+        const passwordStrength = document.getElementById('passwordStrength');
+        const passwordValidation = document.getElementById('passwordValidation');
+        
+        if (passwordInput && passwordStrength && passwordValidation) {
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                
+                // Update validation message
+                if (password.length === 0) {
+                    passwordValidation.innerHTML = '<small class="text-muted">Minimum 8 characters required</small>';
+                    passwordValidation.className = 'validation-message';
+                    passwordStrength.style.display = 'none';
+                } else if (password.length < 8) {
+                    passwordValidation.innerHTML = `<small class="text-warning"><i class="fas fa-exclamation-circle me-1"></i>${password.length}/8 characters</small>`;
+                    passwordValidation.className = 'validation-message invalid';
+                    passwordStrength.style.display = 'none';
+                } else {
+                    passwordValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Minimum length met</small>';
+                    passwordValidation.className = 'validation-message valid';
+                    passwordStrength.style.display = 'block';
+                }
+                
+                // Update strength indicator
+                if (password.length >= 8) {
+                    let strength = 'Weak';
+                    let strengthClass = 'weak';
+                    let strengthText = '';
+                    let progressWidth = '30%';
+                    
+                    const hasLower = /[a-z]/.test(password);
+                    const hasUpper = /[A-Z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+                    const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+                    
+                    let score = 0;
+                    if (hasLower) score++;
+                    if (hasUpper) score++;
+                    if (hasNumber) score++;
+                    if (hasSpecial) score++;
+                    if (password.length >= 12) score++;
+                    
+                    switch(score) {
+                        case 0:
+                        case 1:
+                            strength = 'Weak';
+                            strengthClass = 'danger';
+                            strengthText = 'Add more character types';
+                            progressWidth = '30%';
+                            break;
+                        case 2:
+                            strength = 'Fair';
+                            strengthClass = 'warning';
+                            strengthText = 'Could be stronger';
+                            progressWidth = '50%';
+                            break;
+                        case 3:
+                            strength = 'Good';
+                            strengthClass = 'info';
+                            strengthText = 'Good password';
+                            progressWidth = '70%';
+                            break;
+                        case 4:
+                        case 5:
+                            strength = 'Strong';
+                            strengthClass = 'success';
+                            strengthText = 'Very strong password';
+                            progressWidth = '100%';
+                            break;
+                    }
+                    
+                    passwordStrength.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Strength: <strong class="text-${strengthClass}">${strength}</strong></span>
+                            <small class="text-muted">${strengthText}</small>
+                        </div>
+                        <div class="progress mt-1" style="height: 4px;">
+                            <div class="progress-bar bg-${strengthClass}" 
+                                 role="progressbar" 
+                                 style="width: ${progressWidth}" 
+                                 aria-valuenow="${progressWidth.replace('%', '')}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        // Password match validation
+        const passwordMatchError = document.getElementById('passwordMatchError');
+        const confirmPasswordValidation = document.getElementById('confirmPasswordValidation');
+        
+        function checkPasswordMatch() {
+            if (passwordInput && confirmPasswordInput) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword.length === 0) {
+                    passwordMatchError.style.display = 'none';
+                    confirmPasswordValidation.innerHTML = '<small class="text-muted">Re-enter your password</small>';
+                    confirmPasswordValidation.className = 'validation-message';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    return true;
+                }
+                
+                if (password === confirmPassword) {
+                    passwordMatchError.style.display = 'none';
+                    confirmPasswordValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Passwords match</small>';
+                    confirmPasswordValidation.className = 'validation-message valid';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    return true;
+                } else {
+                    passwordMatchError.style.display = 'block';
+                    confirmPasswordValidation.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>Passwords do not match</small>';
+                    confirmPasswordValidation.className = 'validation-message invalid';
+                    confirmPasswordInput.classList.add('is-invalid');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        }
+        if (passwordInput) {
+            passwordInput.addEventListener('input', checkPasswordMatch);
+        }
+        
+        // Form validation
+        const registerForm = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(event) {
+                let isValid = true;
+                
+                // Check name validation
+                if (nameInput) {
+                    const namePattern = /^[A-Za-z][A-Za-z\s]*$/;
+                    if (!namePattern.test(nameInput.value.trim())) {
+                        nameInput.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        nameInput.classList.remove('is-invalid');
+                    }
+                }
+                
+                // Check phone validation (exactly 10 digits)
+                if (phoneInput) {
+                    const phoneDigits = phoneInput.value.replace(/\D/g, '');
+                    if (phoneDigits.length !== 10) {
+                        phoneInput.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        phoneInput.classList.remove('is-invalid');
+                    }
+                }
+                
+                // Check password length
+                if (passwordInput && passwordInput.value.length < 8) {
+                    passwordInput.classList.add('is-invalid');
+                    isValid = false;
+                } else if (passwordInput) {
+                    passwordInput.classList.remove('is-invalid');
+                }
+                
+                // Check password match
+                if (!checkPasswordMatch()) {
+                    isValid = false;
+                }
+                
+                // Check terms agreement
+                const termsCheckbox = document.getElementById('id_terms');
+                if (termsCheckbox && !termsCheckbox.checked) {
+                    termsCheckbox.classList.add('is-invalid');
+                    isValid = false;
+                } else if (termsCheckbox) {
+                    termsCheckbox.classList.remove('is-invalid');
+                }
+                
+                // Prevent form submission if validation fails
+                if (!isValid) {
+                    event.preventDefault();
+                    alert('Please fix the errors in the form before submitting.');
+                    return;
+                }
+                
+                // Show loading state
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating Account...';
+                    submitBtn.disabled = true;
+                }
+            });
+        }
+        
+        // Real-time validation feedback
+        const formInputs = registerForm.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && this.value.trim() === '') {
+                    this.classList.add('is-invalid');
+                } else if (this.type !== 'checkbox') {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.type !== 'checkbox') {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+        
+        // Hide spinner when page loads
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const spinner = document.getElementById('spinner');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}

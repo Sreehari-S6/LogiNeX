@@ -1,0 +1,134 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block main %}
+
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header">
+    <div class="container">
+        <h2 class="fw-bold">My Transportation Requests</h2>
+        <p class="mb-0">Requests you have sent to shipping companies</p>
+    </div>
+</div>
+
+<!-- ================= REQUEST TABLE ================= -->
+<div class="container py-5">
+    <div class="dashboard-card p-4">
+
+        <h4 class="mb-4 text-primary">Sent Requests</h4>
+
+        {% if requests %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+    <tr>
+        <th>#</th>
+        <th>Ship</th>
+        <th>Company</th>
+        <th>Route</th>
+        <th>Container</th>
+        <th>Weight</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Requested On</th>
+        <th>Action</th>
+    </tr>
+</thead>
+
+                <tbody>
+{% for r in requests %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+
+    <!-- Ship -->
+    <td>
+        <div class="d-flex align-items-center gap-2">
+            <img src="{{ r.ship_id.image.url }}"
+                 width="55" height="40"
+                 class="rounded"
+                 alt="Ship">
+            {{ r.ship_id.ship_name }}
+        </div>
+    </td>
+
+    <!-- Company -->
+    <td>{{ r.company_id.name }}</td>
+
+    <!-- Route -->
+    <td>{{ r.route_id }}</td>
+
+    <!-- Container -->
+    <td>{{ r.container_type }}</td>
+
+    <!-- Weight -->
+    <td>{{ r.weight_ton }} Ton</td>
+
+    <!-- Amount -->
+    <td>
+        {% if r.amount %}
+            ₹ {{ r.amount }}
+        {% else %}
+            <span class="text-muted">Not Assigned</span>
+        {% endif %}
+    </td>
+
+    <!-- Status -->
+    <td>
+        {% if r.status == "Pending" %}
+            <span class="status-badge status-pending">Pending</span>
+        {% elif r.status == "Approved" %}
+            <span class="status-badge status-in-transit">Approved</span>
+        {% elif r.status == "Completed" %}
+            <span class="status-badge status-delivered">Completed</span>
+        {% else %}
+            <span class="badge bg-secondary">{{ r.status }}</span>
+        {% endif %}
+    </td>
+
+    <!-- Date -->
+    <td>{{ r.requested_at|date:"d M Y" }}</td>
+
+   <!-- Action -->
+<td>
+    {% if r.request_id in paid_request_ids %}
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-success" disabled>
+                Paid
+            </button>
+
+            <a href="{% url 'LUser:payment_success' r.request_id %}"
+               class="btn btn-sm btn-primary">
+                Download Invoice
+            </a>
+        </div>
+
+    {% elif r.status == "Approved" %}
+
+        <a href="{% url 'LUser:pay_shipping_fee' r.request_id %}"
+           class="btn btn-sm btn-success">
+            PAY Shipping Fee
+        </a>
+
+    {% else %}
+        <button class="btn btn-sm btn-secondary" disabled>
+            Pay
+        </button>
+    {% endif %}
+</td>
+
+</tr>
+{% endfor %}
+</tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                No transportation requests sent yet.
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

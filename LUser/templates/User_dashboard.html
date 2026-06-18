@@ -1,0 +1,295 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block style %}
+<style>
+.dashboard-header {
+    background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+    color: #fff;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 15px 15px;
+}
+
+.dashboard-card {
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.dashboard-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 28px;
+    color: #fff;
+}
+
+.status-badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-pending { background:#ffc107; color:#000; }
+.status-in-transit { background:#17a2b8; color:#fff; }
+.status-delivered { background:#28a745; color:#fff; }
+
+.activity-timeline {
+    list-style:none;
+    padding:0;
+}
+
+.activity-timeline li {
+    padding:14px 0 14px 30px;
+    border-bottom:1px solid #eee;
+    position:relative;
+}
+
+.activity-timeline li::before {
+    content:'';
+    position:absolute;
+    left:0;
+    top:20px;
+    width:10px;
+    height:10px;
+    background:#0066cc;
+    border-radius:50%;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-8">
+                <h2 class="fw-bold mb-1">Welcome back, {{ user_name }}</h2>
+                <p class="mb-0">Manage your logistics from one place</p>
+            </div>
+
+            <div class="col-md-4 text-end">
+                <div class="bg-white rounded-circle p-3 d-inline-block">
+                    <i class="fas fa-user fa-2x text-primary"></i>
+                </div>
+                <div class="small mt-2">{{ user_email }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= QUICK ACTIONS ================= -->
+<div class="container py-4">
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <a href="{% url 'LUser:search_ships' %}" class="text-decoration-none text-dark">
+                <div class="dashboard-card p-4 text-center">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h6>Search Ships</h6>
+                    <small class="text-muted">Browse available ships</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+    <a href="{% url 'LUser:view_available_routes' %}" class="text-decoration-none text-dark">
+        <div class="dashboard-card p-4 text-center">
+            <div class="dashboard-icon">
+                <i class="fas fa-route"></i>
+            </div>
+            <h6>View Available Routes</h6>
+            <small class="text-muted">See active transport routes</small>
+        </div>
+    </a>
+</div>
+
+        <div class="col-md-3">
+            <a href="{% url 'LUser:user_view_requests' %}" class="text-decoration-none text-dark">
+                <div class="dashboard-card p-4 text-center">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h6>My Requests</h6>
+                    <small class="text-muted">View sent requests</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{% url 'LUser:user_view_requests' %}" class="text-decoration-none text-dark">
+                <div class="dashboard-card p-4 text-center">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h6>Payments</h6>
+                    <small class="text-muted">Complete payments</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{% url 'LUser:user_view_requests' %}" class="text-decoration-none text-dark">
+                <div class="dashboard-card p-4 text-center">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h6>Track Shipments</h6>
+                    <small class="text-muted">Check status</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+    <a href="{% url 'LUser:completed_orders' %}" class="text-decoration-none text-dark">
+        <div class="dashboard-card p-4 text-center">
+            <div class="dashboard-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h6>Completed Orders</h6>
+            <small class="text-muted">
+                View & review finished shipments
+            </small>
+        </div>
+    </a>
+</div>
+
+
+    </div>
+</div>
+
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="container-fluid bg-light py-4">
+<div class="container">
+<div class="row g-4">
+
+<!-- ========= RECENT SHIPMENTS ========= -->
+<div class="col-lg-8">
+<div class="dashboard-card p-4">
+<h5 class="mb-3">Recent Shipments</h5>
+
+<table class="table table-hover">
+<thead class="table-primary">
+<tr>
+    <th>ID</th>
+    <th>Destination</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for r in recent_requests %}
+<tr>
+
+<td>#SH-{{ r.request_id }}</td>
+
+<td>{{ r.route_id.arrival_port }}</td>
+
+<td>
+{% if r.status == "Pending" %}
+<span class="status-badge status-pending">Pending</span>
+{% elif r.status == "In Transit" %}
+<span class="status-badge status-in-transit">In Transit</span>
+{% elif r.status == "Delivered" %}
+<span class="status-badge status-delivered">Delivered</span>
+{% else %}
+<span class="badge bg-secondary">{{ r.status }}</span>
+{% endif %}
+</td>
+
+<td>
+{% if r.request_id in paid_request_ids %}
+<span class="btn btn-sm btn-success disabled">Paid</span>
+{% else %}
+<a href="{% url 'LUser:pay_shipping_fee' r.request_id %}"
+   class="btn btn-sm btn-outline-success">
+   Pay
+</a>
+{% endif %}
+</td>
+
+</tr>
+
+{% empty %}
+<tr>
+<td colspan="5" class="text-center text-muted">
+No shipments found
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+</div>
+
+<!-- ========= ACTIVITY ========= -->
+<div class="col-lg-4">
+<div class="dashboard-card p-4">
+<h6>Recent Activity</h6>
+
+<ul class="activity-timeline">
+
+{% for p in recent_payments %}
+<li>
+<strong>Payment ₹{{ p.amount }}</strong><br>
+<small>{{ p.date|timesince }} ago</small>
+</li>
+{% empty %}
+<li>
+<strong>No activity yet</strong><br>
+<small>Book a shipment to begin</small>
+</li>
+{% endfor %}
+
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ================= ADDRESS MODAL ================= -->
+{% if address_missing %}
+<div class="modal fade show" style="display:block; background:rgba(0,0,0,0.6);">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content border-0 shadow">
+
+<div class="modal-header bg-danger text-white">
+<h5 class="modal-title">
+<i class="fas fa-exclamation-triangle me-2"></i>
+Address Required
+</h5>
+</div>
+
+<div class="modal-body text-center">
+<p class="lead">Please add your address to continue.</p>
+</div>
+
+<div class="modal-footer justify-content-center">
+<a href="{% url 'LUser:add_address' %}"
+   class="btn btn-primary btn-lg">
+Add Address Now
+</a>
+</div>
+
+</div>
+</div>
+</div>
+{% endif %}
+
+{% endblock %}

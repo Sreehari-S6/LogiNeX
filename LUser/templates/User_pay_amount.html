@@ -1,0 +1,161 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block main %}
+
+<!-- ================= HEADER ================= -->
+<div class="dashboard-header bg-primary text-white py-4">
+    <div class="container">
+        <h2 class="fw-bold mb-1">Shipping Fee Payment</h2>
+        <p class="mb-0">Complete your payment securely</p>
+    </div>
+</div>
+
+<!-- ================= PAYMENT CARD ================= -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="dashboard-card p-4 shadow-lg rounded-4">
+
+                <h4 class="text-primary fw-bold mb-4 text-center">
+                    Shipment Summary
+                </h4>
+
+                <table class="table table-borderless align-middle">
+                    <tr>
+                        <th class="text-muted">Ship</th>
+                        <td class="fw-semibold">{{ r.ship_id.ship_name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Company</th>
+                        <td>{{ r.company_id.name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Route</th>
+                        <td>{{ r.route_id }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Container Type</th>
+                        <td>{{ r.container_type }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Weight</th>
+                        <td>{{ r.weight_ton }} Ton</td>
+                    </tr>
+                </table>
+
+                <!-- Amount -->
+                <div class="alert alert-success text-center fs-5 fw-bold rounded-3">
+                    Total Amount to Pay : ₹ {{ r.amount }}
+                </div>
+
+                <!-- Pay Button -->
+                <div class="text-center mt-4">
+                    <button class="btn btn-success btn-lg px-5"
+                            data-bs-toggle="modal"
+                            data-bs-target="#paymentModal">
+                        <i class="bi bi-credit-card"></i> Pay Now
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= PAYMENT MODAL ================= -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Choose Payment Method</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="alert alert-primary text-center">
+                    Amount Payable : <strong>₹ {{ r.amount }}</strong>
+                </div>
+
+                <!-- Method Select -->
+                <div class="mb-3">
+                    <select class="form-select" onchange="showPayment(this.value)">
+                        <option value="">-- Select Payment Method --</option>
+                        <option value="upi">UPI</option>
+                    </select>
+                </div>
+
+                <!-- ================= UPI SECTION ================= -->
+                <div id="upiSection" class="d-none text-center">
+
+                    <p class="fw-semibold mb-2">Scan QR Code to Pay</p>
+
+                    <img id="upiQR"
+                         width="220"
+                         class="img-fluid border rounded shadow-sm">
+
+                    <p class="text-muted mt-2">
+                        UPI ID : sreeharisajeev2006@okicici
+                    </p>
+
+                    {% comment %} <a id="upiLink"
+                       class="btn btn-outline-primary mt-3"
+                       target="_blank">
+                       Open in UPI App
+                    </a> {% endcomment %}
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <a href="{% url 'LUser:payment_success' r.request_id %}"
+                class="btn btn-success">
+                 Confirm Payment
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+
+function showPayment(method) {
+    document.getElementById("upiSection").classList.add("d-none");
+
+    if (method === "upi") {
+        document.getElementById("upiSection").classList.remove("d-none");
+        generateUPIQR();
+    }
+}
+
+function generateUPIQR() {
+
+    const amount = "{{ r.amount }}";
+    const upiId = "sreeharisajeev2006@okicici";
+    const payeeName = "Shipping Payment";
+
+    // UPI deep link
+    const upiURL = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR`;
+
+    // QR generator API
+    const qrURL = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" 
+                  + encodeURIComponent(upiURL);
+
+    document.getElementById("upiQR").src = qrURL;
+    document.getElementById("upiLink").href = upiURL;
+}
+
+</script>
+
+{% endblock %}

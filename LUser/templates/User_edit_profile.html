@@ -1,0 +1,326 @@
+{% extends "User_nav.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #0056b3;
+        --secondary-color: #004494;
+        --accent-color: #e3f2fd;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --input-bg: #f8f9fa;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-dark);
+    }
+
+    /* --- Header Design --- */
+    .profile-header {
+        background: linear-gradient(120deg, #0056b3 0%, #0080ff 100%);
+        color: white;
+        padding: 3rem 0 4rem 0; /* Extra bottom padding for overlap */
+        position: relative;
+        margin-bottom: 2rem;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
+    }
+
+    /* --- Card Design --- */
+    .profile-card {
+        background: white;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        height: 100%; /* For equal height columns */
+    }
+
+    .section-icon {
+        background: var(--accent-color);
+        color: var(--primary-color);
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .card-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* --- Modern Input Styling --- */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group-text {
+        background: var(--input-bg);
+        border: 1px solid #e0e0e0;
+        border-right: none;
+        color: var(--text-muted);
+        border-radius: 12px 0 0 12px;
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid #e0e0e0;
+        border-radius: 0 12px 12px 0; /* Square left, round right to match icon */
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: none;
+    }
+
+    .form-control:focus {
+        background-color: #fff;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- Grid Layouts --- */
+    .address-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    @media (max-width: 992px) {
+        .address-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* --- Button --- */
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 14px 50px;
+        font-weight: 600;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0, 86, 179, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 86, 179, 0.4);
+        color: white;
+    }
+
+    /* Error Helper */
+    .text-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<!-- HEADER -->
+<div class="profile-header text-center">
+    <h1 class="fw-bold display-6">My Profile</h1>
+    <p class="opacity-75">Manage your personal information and preferences</p>
+</div>
+
+<div class="container" style="max-width: 1100px; margin-top: -3rem;"> <!-- Negative margin for overlap -->
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- TOP ROW: Basic Info & Security -->
+    <div class="row g-4 mb-4">
+        
+        <!-- Basic Info -->
+        <div class="col-lg-6">
+            <div class="profile-card">
+                <div class="card-title">
+                    <span class="section-icon"><i class="bi bi-person-fill"></i></span>
+                    Basic Information
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        {{ profile_form.name }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                        {{ profile_form.phno }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security -->
+        <div class="col-lg-6">
+            <div class="profile-card">
+                <div class="card-title">
+                    <span class="section-icon"><i class="bi bi-shield-lock-fill"></i></span>
+                    Security Settings
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Current Password <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        {{ profile_form.current_password }}
+                    </div>
+                    <small class="text-muted" style="font-size: 0.75rem;">Enter your current password to save changes.</small>
+                    {% if profile_form.current_password.errors %}
+                        <span class="text-error">{{ profile_form.current_password.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                {{ profile_form.new_password }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-check-circle"></i></span>
+                                {{ profile_form.confirm_new_password }}
+                            </div>
+                            {% if profile_form.confirm_new_password.errors %}
+                                <span class="text-error">{{ profile_form.confirm_new_password.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if profile_form.non_field_errors %}
+                    <div class="alert alert-danger mt-2 py-2 small">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ profile_form.non_field_errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM ROW: Address -->
+    <div class="row">
+        <div class="col-12">
+            <div class="profile-card">
+                <div class="card-title">
+                    <span class="section-icon"><i class="bi bi-geo-alt-fill"></i></span>
+                    Address Details
+                </div>
+
+                <div class="address-grid">
+                    
+                    <!-- Type -->
+                    <div class="form-group">
+                        <label class="form-label">Address Type</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                            {{ address_form.type }}
+                        </div>
+                    </div>
+
+                    <!-- Place -->
+                    <div class="form-group">
+                        <label class="form-label">House / Flat No.</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-house"></i></span>
+                            {{ address_form.place }}
+                        </div>
+                    </div>
+
+                    <!-- City -->
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-city"></i></i></span>
+                            {{ address_form.city }}
+                        </div>
+                    </div>
+
+                    <!-- District -->
+                    <div class="form-group">
+                        <label class="form-label">District</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-signpost"></i></span>
+                            {{ address_form.district }}
+                        </div>
+                    </div>
+
+                    <!-- State -->
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-map"></i></span>
+                            {{ address_form.state }}
+                        </div>
+                    </div>
+
+                    <!-- Pincode -->
+                    <div class="form-group">
+                        <label class="form-label">Pincode</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-mailbox"></i></span>
+                            {{ address_form.pincode }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTION BUTTON -->
+    <div class="text-center mt-4 mb-5">
+        <button type="submit" class="btn btn-save text-white">
+            <i class="bi bi-save me-2"></i> Save Changes
+        </button>
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}

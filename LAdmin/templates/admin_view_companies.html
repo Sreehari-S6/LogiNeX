@@ -1,0 +1,80 @@
+{% extends "admin_indexnav.html" %}
+{% block title %}Approve Companies{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+<h3 class="mb-3">Company Approvals ({{ total_companies }})</h3>
+
+<div class="data-table">
+<table class="table table-hover mb-0">
+<thead class="table-light">
+<tr>
+    <th>#</th>
+    <th>Company</th>
+    <th>Owner</th>
+    <th>Location</th>
+    <th>Licence</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for c in companies %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+
+    <td>
+        <strong>{{ c.name }}</strong><br>
+        <small class="text-muted">{{ c.country }}</small>
+    </td>
+
+    <td>{{ c.owner_name }}</td>
+
+    <td>{{ c.district }}, {{ c.state }}</td>
+
+    <td>
+        {% if c.licence %}
+            <a href="/media/{{ c.licence }}" target="_blank"
+               class="badge bg-info">
+                View Licence
+            </a>
+        {% else %}
+            N/A
+        {% endif %}
+    </td>
+
+    <td>
+        <span class="badge bg-secondary">{{ c.status }}</span>
+    </td>
+
+    <td>
+        <form method="post"
+              action="{% url 'LAdmin:update_company_status' %}">
+            {% csrf_token %}
+            <input type="hidden" name="company_id" value="{{ c.id }}">
+
+            <select name="status"
+                    class="form-select form-select-sm mb-1"
+                    required>
+                <option value="">Select</option>
+                <option value="Approved">Approve</option>
+                <option value="Rejected">Reject</option>
+                <option value="Under Scrutiny">Under Scrutiny</option>
+            </select>
+
+            <button type="submit"
+                    class="btn btn-sm btn-orange w-100">
+                Update
+            </button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+</div>
+{% endblock %}

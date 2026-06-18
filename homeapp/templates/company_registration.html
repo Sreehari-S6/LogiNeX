@@ -1,0 +1,598 @@
+{% extends "indexnav.html" %}
+{% load static %}
+
+{% block style %}
+<style>
+    .register-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .register-logo {
+        color: #0d6efd;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    .register-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 10;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+    .password-container {
+        position: relative;
+    }
+    .password-strength {
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    .password-strength.weak {
+        color: #dc3545;
+    }
+    .password-strength.medium {
+        color: #ffc107;
+    }
+    .password-strength.strong {
+        color: #198754;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .required-field label:after {
+        content: " *";
+        color: #dc3545;
+    }
+    .asteriskField {
+        color: #dc3545;
+    }
+    .validation-message {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+    .validation-message.valid {
+        color: #198754;
+    }
+    .validation-message.invalid {
+        color: #dc3545;
+    }
+    .section-header {
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    .errorlist {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+        margin-bottom: 0;
+    }
+    .errorlist li {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5" style="margin-bottom: 6rem;">
+        <div class="container py-5">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Company Registration</h1>
+            <nav aria-label="breadcrumb animated slideInDown">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a class="text-white" href="{% url 'index' %}">Home</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Register Company</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Register Form Start -->
+    <div class="container-fluid overflow-hidden py-5 px-lg-0">
+        <div class="container py-5 px-lg-0">
+            <div class="row g-5 mx-lg-0 justify-content-center">
+                <div class="col-md-12 col-lg-10">
+                    <div class="register-container wow fadeIn" data-wow-delay="0.1s">
+                        <div class="register-header">
+                            <div class="register-logo">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <h1 class="mb-2">Register Your Company</h1>
+                            <p class="text-secondary">Create an account to start managing your business operations</p>
+                        </div>
+                        
+                        {% if messages %}
+                        <div class="alert alert-dismissible fade show" role="alert">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="POST" action="{% url 'company_register' %}" id="companyRegisterForm" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row g-3">
+                                
+                                <!-- Company Information Section -->
+                                <div class="col-12">
+                                    <div class="form-section">
+                                        <h5 class="section-header"><i class="fas fa-building me-2"></i>Company Information</h5>
+                                        
+                                        <!-- Company Name -->
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.name }}
+                                                <label for="id_name" class="form-label">Company Name <span class="text-danger">*</span></label>
+                                                {% if form.name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.name.errors }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Owner Name -->
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                {{ form.owner_name }}
+                                                <label for="id_owner_name" class="form-label">Owner Name <span class="text-danger">*</span></label>
+                                                {% if form.owner_name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.owner_name.errors }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Business License -->
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3">
+                                                {{ form.licence }}
+                                                <label for="id_licence" class="form-label">Business License Document <span class="text-danger">*</span></label>
+                                                {% if form.licence.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.licence.errors }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        
+                                     <!-- ID Proof Number -->
+<div class="col-md-6">
+    <div class="form-floating mb-3">
+        {{ form.id_proof }}
+        <label for="id_id_proof" class="form-label">
+            ID Proof Number <span class="text-danger">*</span>
+        </label>
+
+        {% if form.id_proof.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.id_proof.errors }}
+            </div>
+        {% endif %}
+
+        <small class="text-muted">
+            Example: Aadhaar / PAN / Passport number
+        </small>
+    </div>
+</div>
+
+                                
+                                <!-- Location Information Section -->
+                                <div class="col-12">
+                                    <div class="form-section">
+                                        <h5 class="section-header"><i class="fas fa-map-marker-alt me-2"></i>Location Information</h5>
+                                        
+                                        <div class="row">
+                                            <!-- Country -->
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    {{ form.country }}
+                                                    <label for="id_country" class="form-label">Country <span class="text-danger">*</span></label>
+                                                    {% if form.country.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.country.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- State -->
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    {{ form.state }}
+                                                    <label for="id_state" class="form-label">State/Province <span class="text-danger">*</span></label>
+                                                    {% if form.state.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.state.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- District -->
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    {{ form.district }}
+                                                    <label for="id_district" class="form-label">District <span class="text-danger">*</span></label>
+                                                    {% if form.district.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.district.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Login Credentials Section -->
+                                <div class="col-12">
+                                    <div class="form-section">
+                                        <h5 class="section-header"><i class="fas fa-user-shield me-2"></i>Login Credentials</h5>
+                                        
+                                        <div class="row">
+                                            <!-- Email -->
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3">
+                                                    {{ form.email }}
+                                                    <label for="id_email" class="form-label">Company Email <span class="text-danger">*</span></label>
+                                                    {% if form.email.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.email.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            
+                                            <!-- Password -->
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="password-container">
+                                                        <div class="form-floating">
+                                                            {{ form.password }}
+                                                            <label for="id_password" class="form-label">Password <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    {% if form.password.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.password.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="password-strength mt-2" id="passwordStrength"></div>
+                                                    <div class="validation-message mt-1" id="passwordValidation">
+                                                        <small>Minimum 8 characters required</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Confirm Password -->
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="password-container">
+                                                        <div class="form-floating">
+                                                            {{ form.confirm_password }}
+                                                            <label for="id_confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    {% if form.confirm_password.errors %}
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ form.confirm_password.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="text-danger mt-2" id="passwordMatchError" style="display: none; font-size: 0.85rem;">
+                                                        Passwords do not match
+                                                    </div>
+                                                    <div class="validation-message mt-1" id="confirmPasswordValidation">
+                                                        <small>Re-enter your password</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms and Conditions -->
+                                <div class="col-12">
+                                    <div class="form-check mb-3">
+                                        {{ form.terms }}
+                                        <label class="form-check-label" for="id_terms">
+                                            I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a> <span class="text-danger">*</span>
+                                        </label>
+                                        {% if form.terms.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.terms.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100 py-3" type="submit" id="submitBtn">
+                                        <i class="fas fa-building me-2"></i>Register Company
+                                    </button>
+                                </div>
+                                
+                                <!-- Login Link -->
+                                <div class="col-12">
+                                    <div class="text-center pt-3">
+                                        <p class="mb-0">Already have an account? 
+                                            <a href="{% url 'login' %}" class="text-primary fw-bold">Sign in here</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div class="register-footer mt-4">
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-lock me-1"></i>
+                                Your information is secured with 256-bit SSL encryption
+                            </p>
+                            <p class="text-muted mt-2">
+                                <small>By registering, you agree to our 
+                                    <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                    <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Register Form End -->
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password toggle functionality
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('id_password');
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const confirmPasswordInput = document.getElementById('id_confirm_password');
+        
+        // Toggle main password visibility
+        if (passwordToggle && passwordInput) {
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                const icon = passwordToggle.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Toggle confirm password visibility
+        if (confirmPasswordToggle && confirmPasswordInput) {
+            confirmPasswordToggle.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                const icon = confirmPasswordToggle.querySelector('i');
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
+        }
+        
+        // Phone validation - exactly 10 digits
+        const phoneInput = document.getElementById('id_phone');
+        const phoneValidation = document.getElementById('phoneValidation');
+        
+        if (phoneInput && phoneValidation) {
+            phoneInput.addEventListener('input', function() {
+                const phone = phoneInput.value.replace(/\D/g, '');
+                phoneInput.value = phone;
+                
+                if (phone.length === 0) {
+                    phoneValidation.innerHTML = '<small class="text-muted">Enter exactly 10 digits</small>';
+                } else if (phone.length === 10) {
+                    phoneValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Valid phone number</small>';
+                } else if (phone.length < 10) {
+                    phoneValidation.innerHTML = `<small class="text-warning"><i class="fas fa-exclamation-circle me-1"></i>${phone.length}/10 digits</small>`;
+                } else {
+                    phoneValidation.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>Must be exactly 10 digits</small>';
+                    phoneInput.value = phone.substring(0, 10);
+                }
+            });
+        }
+        
+        // Password strength indicator
+        const passwordStrength = document.getElementById('passwordStrength');
+        const passwordValidation = document.getElementById('passwordValidation');
+        
+        if (passwordInput && passwordStrength && passwordValidation) {
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                
+                if (password.length === 0) {
+                    passwordValidation.innerHTML = '<small class="text-muted">Minimum 8 characters required</small>';
+                    passwordStrength.style.display = 'none';
+                } else if (password.length < 8) {
+                    passwordValidation.innerHTML = `<small class="text-warning"><i class="fas fa-exclamation-circle me-1"></i>${password.length}/8 characters</small>`;
+                    passwordStrength.style.display = 'none';
+                } else {
+                    passwordValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Minimum length met</small>';
+                    passwordStrength.style.display = 'block';
+                    
+                    let strength = 'Weak';
+                    let strengthClass = 'danger';
+                    let progressWidth = '30%';
+                    
+                    const hasLower = /[a-z]/.test(password);
+                    const hasUpper = /[A-Z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+                    const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+                    
+                    let score = 0;
+                    if (hasLower) score++;
+                    if (hasUpper) score++;
+                    if (hasNumber) score++;
+                    if (hasSpecial) score++;
+                    if (password.length >= 12) score++;
+                    
+                    switch(score) {
+                        case 0:
+                        case 1:
+                            strength = 'Weak';
+                            strengthClass = 'danger';
+                            progressWidth = '30%';
+                            break;
+                        case 2:
+                            strength = 'Fair';
+                            strengthClass = 'warning';
+                            progressWidth = '50%';
+                            break;
+                        case 3:
+                            strength = 'Good';
+                            strengthClass = 'info';
+                            progressWidth = '70%';
+                            break;
+                        case 4:
+                        case 5:
+                            strength = 'Strong';
+                            strengthClass = 'success';
+                            progressWidth = '100%';
+                            break;
+                    }
+                    
+                    passwordStrength.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Strength: <strong class="text-${strengthClass}">${strength}</strong></span>
+                        </div>
+                        <div class="progress mt-1" style="height: 4px;">
+                            <div class="progress-bar bg-${strengthClass}" 
+                                 role="progressbar" 
+                                 style="width: ${progressWidth}">
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        // Password match validation
+        const passwordMatchError = document.getElementById('passwordMatchError');
+        const confirmPasswordValidation = document.getElementById('confirmPasswordValidation');
+        
+        function checkPasswordMatch() {
+            if (passwordInput && confirmPasswordInput) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword.length === 0) {
+                    passwordMatchError.style.display = 'none';
+                    confirmPasswordValidation.innerHTML = '<small class="text-muted">Re-enter your password</small>';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    return true;
+                }
+                
+                if (password === confirmPassword) {
+                    passwordMatchError.style.display = 'none';
+                    confirmPasswordValidation.innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Passwords match</small>';
+                    confirmPasswordInput.classList.remove('is-invalid');
+                    return true;
+                } else {
+                    passwordMatchError.style.display = 'block';
+                    confirmPasswordValidation.innerHTML = '<small class="text-danger"><i class="fas fa-times-circle me-1"></i>Passwords do not match</small>';
+                    confirmPasswordInput.classList.add('is-invalid');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        }
+        if (passwordInput) {
+            passwordInput.addEventListener('input', checkPasswordMatch);
+        }
+        
+        // File upload validation
+        const idProofFile = document.getElementById('id_proof_file');
+        if (idProofFile) {
+            idProofFile.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                    const maxSize = 5 * 1024 * 1024;
+                    
+                    if (!validTypes.includes(file.type)) {
+                        this.classList.add('is-invalid');
+                        alert('Please upload a PDF, JPG, or PNG file.');
+                        this.value = '';
+                    } else if (file.size > maxSize) {
+                        this.classList.add('is-invalid');
+                        alert('File size must be less than 5MB.');
+                        this.value = '';
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                }
+            });
+        }
+        
+        // Form validation
+        const companyRegisterForm = document.getElementById('companyRegisterForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (companyRegisterForm) {
+            companyRegisterForm.addEventListener('submit', function(event) {
+                let isValid = true;
+                
+                // Check password match
+                if (!checkPasswordMatch()) {
+                    isValid = false;
+                }
+                
+                // Show loading state
+                if (submitBtn && isValid) {
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Registering...';
+                    submitBtn.disabled = true;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

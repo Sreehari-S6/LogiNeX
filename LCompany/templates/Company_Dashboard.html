@@ -1,0 +1,220 @@
+{% extends "company_navbar.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block main %}
+
+<style>
+/* ===== DASHBOARD TABLE VISIBILITY FIX ===== */
+
+.data-table {
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.data-table table {
+    color: #111 !important;
+    margin-bottom: 0;
+}
+
+.data-table thead {
+    background: #111;
+}
+
+.data-table thead th {
+    color: #ffd000 !important;
+    font-weight: 600;
+    border: none;
+}
+
+.data-table tbody td {
+    color: #222 !important;
+    background: #ffffff;
+    border-color: #eee;
+}
+
+.data-table tbody tr:hover td {
+    background: #fff6cc !important;
+}
+
+.table-header {
+    background: #606471;
+    padding: 14px 18px;
+    font-weight: 600;
+    color: #000;
+}
+
+.btn-outline-yellow {
+    border: 1px solid #ffd000;
+    color: #000;
+}
+
+.btn-outline-yellow:hover {
+    background: #ffd000;
+    color: #000;
+}
+</style>
+
+
+<div class="container-fluid">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-yellow mb-2">Dashboard Overview</h1>
+            <p class="text-gray">
+                Welcome back {{ company_name }} — logistics summary below.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'LCompany:add_ship' %}" class="btn btn-yellow">
+                <i class="bi bi-plus-circle me-2"></i>Add Ship
+            </a>
+
+            <a href="{% url 'LCompany:view_requests' %}" class="btn btn-outline-yellow">
+                <i class="bi bi-list-check me-2"></i>View Requests
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ================= STATS ================= -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="card-icon"><i class="bi bi-ship"></i></div>
+                <div class="card-title">Active Ships</div>
+                <div class="card-value">{{ active_ships }}</div>
+                <div class="card-change text-success">Operational</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="card-icon"><i class="bi bi-signpost-split"></i></div>
+                <div class="card-title">Active Routes</div>
+                <div class="card-value">{{ active_routes }}</div>
+                <div class="card-change text-info">Assigned</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="card-icon"><i class="bi bi-clock-history"></i></div>
+                <div class="card-title">Pending Requests</div>
+                <div class="card-value">{{ pending_requests }}</div>
+                <div class="card-change text-warning">Needs approval</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card">
+                <div class="card-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="card-title">Recent Records</div>
+                <div class="card-value">{{ recent_shipments|length }}</div>
+                <div class="card-change text-secondary">Latest entries</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ================= RECENT REQUESTS TABLE ================= -->
+    <div class="row">
+        <div class="col-12">
+
+            <div class="data-table">
+
+                <div class="table-header d-flex justify-content-between align-items-center">
+                    <span>Recent Shipping Requests</span>
+
+                    <a href="{% url 'LCompany:view_requests' %}"
+                       class="btn btn-sm btn-dark">
+                        View All
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover table-bordered align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>User</th>
+                                <th>Route</th>
+                                <th>Container</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for s in recent_shipments %}
+                        <tr>
+
+                            <td><strong>REQ-{{ s.request_id }}</strong></td>
+
+                            <td>{{ s.user_id.name }}</td>
+
+                            <td>{{ s.route_id }}</td>
+
+                            <td>{{ s.container_type }}</td>
+
+                            <td>
+                                {% if s.status == "Approved" %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif s.status == "Pending" %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif s.status == "Rejected" %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% elif s.status == "Under Consideration" %}
+                                    <span class="badge bg-info text-dark">
+                                        Under Review
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ s.status }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ s.requested_at|date:"d M Y" }}</td>
+
+                            <td>
+                                <a href="{% url 'LCompany:view_requests' %}"
+                                   class="btn btn-sm btn-outline-yellow">
+                                    Open
+                                </a>
+                            </td>
+
+                        </tr>
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No recent requests found
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

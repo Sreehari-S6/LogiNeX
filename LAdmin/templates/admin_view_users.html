@@ -1,0 +1,227 @@
+{% extends "admin_indexnav.html" %}
+{% block title %}View Users{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2" style="color: var(--primary-blue);">User Management</h1>
+                    <p class="text-muted">Manage all registered users and their permissions</p>
+                </div>
+                <div>
+                    <button class="btn btn-orange" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="data-table">
+                <div class="table-header">
+                    <h5 class="mb-0">All Users ({{ total_users }})</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, country...">
+                        <button class="btn btn-outline-secondary" type="button" onclick="searchTable()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="usersTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>User Details</th>
+                                <th>Contact</th>
+                                <th>ID Proof</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users %}
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="width: 40px; height: 40px; background: var(--secondary-blue); 
+                                                 border-radius: 50%; display: flex; align-items: center; 
+                                                 justify-content: center; color: white; font-weight: 600; 
+                                                 margin-right: 12px;">
+                                                {{ user.name|slice:":2"|upper }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold">{{ user.name|default:"N/A" }}</div>
+                                                <small class="text-muted">{{ user.email|default:"No email" }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>{{ user.phno|default:"N/A" }}</div>
+                                        <small class="text-muted">{{ user.email|default:"" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ user.id_proof|default:"N/A" }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ user.country|default:"N/A" }}</span>
+                                    </td>
+                                    <td>
+                                        {% if user.status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% elif user.status == 'inactive' %}
+                                            <span class="badge bg-warning">Inactive</span>
+                                        {% elif user.status == 'suspended' %}
+                                            <span class="badge bg-danger">Suspended</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ user.status|default:"Unknown" }}</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="bi bi-people display-6 d-block mb-2"></i>
+                                            No users found
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View User Details Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: white;">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 text-center mb-3">
+                        <div style="width: 80px; height: 80px; background: var(--primary-orange); 
+                             border-radius: 50%; display: inline-flex; align-items: center; 
+                             justify-content: center; color: white; font-size: 24px; font-weight: 600;" 
+                             id="userInitials">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Full Name</label>
+                    <div class="form-control bg-light" id="userName"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <div class="form-control bg-light" id="userEmail"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Phone Number</label>
+                    <div class="form-control bg-light" id="userPhone"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ID Proof</label>
+                    <div class="form-control bg-light" id="userIdProof"></div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Country</label>
+                        <div class="form-control bg-light" id="userCountry"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Status</label>
+                        <div id="userStatus"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to view user details in modal
+    function viewUserDetails(email, name, phone, idProof, country, status) {
+        // Set user initials
+        const initials = name ? name.substring(0, 2).toUpperCase() : 'NA';
+        document.getElementById('userInitials').textContent = initials;
+        
+        // Set user details
+        document.getElementById('userName').textContent = name || 'N/A';
+        document.getElementById('userEmail').textContent = email || 'N/A';
+        document.getElementById('userPhone').textContent = phone || 'N/A';
+        document.getElementById('userIdProof').textContent = idProof || 'N/A';
+        document.getElementById('userCountry').textContent = country || 'N/A';
+        
+        // Set status with appropriate badge
+        let statusBadge = '';
+        if (status === 'active') {
+            statusBadge = '<span class="badge bg-success">Active</span>';
+        } else if (status === 'inactive') {
+            statusBadge = '<span class="badge bg-warning">Inactive</span>';
+        } else if (status === 'suspended') {
+            statusBadge = '<span class="badge bg-danger">Suspended</span>';
+        } else {
+            statusBadge = '<span class="badge bg-secondary">' + (status || 'Unknown') + '</span>';
+        }
+        document.getElementById('userStatus').innerHTML = statusBadge;
+    }
+    
+    // Search function for the table
+    function searchTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('usersTable');
+        const rows = table.getElementsByTagName('tr');
+        
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName('td');
+            let match = false;
+            
+            // Check each cell in the row
+            for (let j = 0; j < cells.length; j++) {
+                const cell = cells[j];
+                if (cell.textContent.toLowerCase().indexOf(filter) > -1) {
+                    match = true;
+                    break;
+                }
+            }
+            
+            // Show/hide row based on match
+            row.style.display = match ? '' : 'none';
+        }
+    }
+    
+    // Add event listener for Enter key in search
+    document.getElementById('searchInput').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            searchTable();
+        }
+    });
+</script>
+{% endblock %}

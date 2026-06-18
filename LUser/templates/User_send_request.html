@@ -1,0 +1,54 @@
+{% extends "User_nav.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block main %}
+
+<div class="container mt-4 mb-5">
+
+    <h4 class="mb-3">Transportation Request</h4>
+
+    <!-- Ship Summary -->
+    <div class="card mb-4">
+        <div class="row g-0">
+
+            <!-- Ship Image -->
+            <div class="col-md-4">
+                {% if ship.image %}
+                    <img src="{{ ship.image.url }}"
+                         class="img-fluid rounded-start"
+                         style="height: 100%; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'assets/img/ship-placeholder.jpg' %}"
+                         class="img-fluid rounded-start">
+                {% endif %}
+            </div>
+
+            <!-- Details -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <p><strong>Company:</strong> {{ company.name }}</p>
+                    <p><strong>Ship:</strong> {{ ship.ship_name }}</p>
+                    <p><strong>Route:</strong> {{ route }}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Request Form -->
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button class="btn btn-success mt-3">
+                    Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

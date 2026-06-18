@@ -1,0 +1,168 @@
+{% extends "company_navbar.html" %}
+{% block title %}Shipping Requests{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- ================= PAGE HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-yellow mb-1">Shipping Requests</h1>
+            <p class="text-gray mb-0">
+                View, approve, reject, and manage shipping payments
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= REQUEST CARDS ================= -->
+    {% if requests %}
+    <div class="row g-4">
+
+        {% for r in requests %}
+        <div class="col-xl-4 col-lg-6 col-md-12">
+
+            <div class="card ship-card h-100 shadow-sm">
+
+                <!-- ===== SHIP IMAGE ===== -->
+                {% if r.ship_id.image %}
+                <img
+                    src="{{ r.ship_id.image.url }}"
+                    class="card-img-top"
+                    style="height: 180px; object-fit: cover;"
+                    alt="Ship Image">
+                {% endif %}
+
+                <!-- ===== CARD BODY ===== -->
+                <div class="card-body">
+
+                    <h5 class="card-title text-yellow mb-2">
+                        {{ r.ship_id.ship_name }}
+                    </h5>
+
+                    <p class="mb-1 text-gray">
+                        <strong>User:</strong> {{ r.user_id.name }}
+                    </p>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Route:</strong> {{ r.route_id }}
+                    </p>
+                    <p class="mb-1 text-gray">
+                        <strong>Pickup:</strong><br>
+                         {{ r.pickup_address }}
+                    </p>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Delivery:</strong><br>
+                        {{ r.delivery_address }}
+                    </p>
+
+
+                    <p class="mb-1 text-gray">
+                        <strong>Container:</strong> {{ r.container_type }}
+                    </p>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Weight:</strong> {{ r.weight_ton }} Ton
+                    </p>
+
+                    <p class="mb-2 text-gray">
+                        <strong>Requested On:</strong>
+                        {{ r.requested_at|date:"d M Y" }}
+                    </p>
+
+                    <!-- ===== STATUS BADGE ===== -->
+                    {% if r.status == "Pending" %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif r.status == "Approved" %}
+                        <span class="badge bg-success">Approved</span>
+                    {% elif r.status == "Rejected" %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% elif r.status == "Under Consideration" %}
+                        <span class="badge bg-info text-dark">
+                            Under Consideration
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ r.status }}</span>
+                    {% endif %}
+
+                </div>
+
+                <!-- ===== CARD FOOTER (ACTIONS) ===== -->
+                <div class="card-footer bg-transparent border-0">
+
+                    <!-- ===== STATUS UPDATE (ALWAYS ALLOWED) ===== -->
+                    <form method="post"
+                          action="{% url 'LCompany:update_request_status' r.request_id %}"
+                          class="mb-3">
+                        {% csrf_token %}
+
+                        <select name="status"
+                                class="form-select form-select-sm mb-2">
+                            <option value="Approved"
+                                {% if r.status == "Approved" %}selected{% endif %}>
+                                Approve
+                            </option>
+                            <option value="Rejected"
+                                {% if r.status == "Rejected" %}selected{% endif %}>
+                                Reject
+                            </option>
+                            <option value="Under Consideration"
+                                {% if r.status == "Under Consideration" %}selected{% endif %}>
+                                Under Consideration
+                            </option>
+                        </select>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-warning w-100">
+                            Update Status
+                        </button>
+                    </form>
+
+                    <!-- ===== PAYMENT SECTION ===== -->
+                   {% if r.status == "Approved" %}
+
+    {% if r.amount and r.amount != "NULL" and r.amount != "None" %}
+        <div class="text-center">
+            <p class="text-success mb-1">
+                <strong>Shipping Fee</strong>
+            </p>
+            <h6 class="text-success">
+                ₹ {{ r.amount }}
+            </h6>
+        </div>
+    {% else %}
+        <form method="post"
+              action="{% url 'LCompany:add_shipping_payment' r.request_id %}">
+            {% csrf_token %}
+            <input type="number"
+                   name="amount"
+                   class="form-control form-control-sm mb-2"
+                   placeholder="Enter shipping fee"
+                   required>
+            <button type="submit"
+                    class="btn btn-sm btn-outline-success w-100">
+                Add Shipping Fee
+            </button>
+        </form>
+    {% endif %}
+
+{% endif %}
+
+
+                </div>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+        <!-- ===== EMPTY STATE ===== -->
+        <div class="alert alert-info text-center">
+            No shipping requests received yet.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

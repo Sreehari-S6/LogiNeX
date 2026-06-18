@@ -1,0 +1,98 @@
+{% extends "User_nav.html" %}
+{% load static %}
+
+{% block style %}
+<style>
+    .search-header {
+        background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .ship-card {
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .ship-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .ship-image {
+        height: 180px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .route-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+<!-- ================= HEADER ================= -->
+<div class="search-header text-center">
+    <h1 class="fw-bold">Search Ships</h1>
+    <p class="lead">Available ships </p>
+</div>
+
+<!-- ================= SHIP CARDS ================= -->
+<div class="container pb-5">
+    <div class="row g-4">
+
+        {% for ship in ships %}
+        <div class="col-md-6 col-lg-4">
+            <div class="ship-card h-100">
+
+                {% if ship.image %}
+                    <img src="{{ ship.image.url }}" class="ship-image">
+                {% else %}
+                    <img src="{% static 'assets/img/ship-placeholder.jpg' %}" class="ship-image">
+                {% endif %}
+
+                <div class="p-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">{{ ship.ship_name }}</h5>
+                        <span class="badge bg-success">{{ ship.status }}</span>
+                    </div>
+
+                    <p class="text-muted mb-2">
+                        Capacity: <strong>{{ ship.capacity_ton }} Tons</strong><br>
+                        Built Year: {{ ship.built_year }}
+                    </p>
+
+                    <hr>
+
+                    
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'LUser:view_ship_routes' ship.ship_id %}" class="btn btn-outline-primary btn-sm">
+                            View Ship
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No ships found</p>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

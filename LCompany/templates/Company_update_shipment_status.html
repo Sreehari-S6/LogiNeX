@@ -1,0 +1,77 @@
+{% extends "company_navbar.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Update Shipment Status{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="h2 text-yellow mb-2">Update Shipment Status</h1>
+        <p class="text-gray">Change shipment progress for user requests</p>
+    </div>
+
+    <div class="row g-4">
+
+        {% for r in requests %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="text-yellow">
+                        Request #{{ r.request_id }}
+                    </h6>
+
+                    <p class="mb-1 text-gray">
+                        <strong>User:</strong> {{ r.user_id.name }}
+                    </p>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Ship:</strong> {{ r.ship_id.ship_name }}
+                    </p>
+
+                    <p class="mb-2 text-gray">
+                        <strong>Route:</strong>
+                        {{ r.route_id.departure_port }}
+                        →
+                        {{ r.route_id.arrival_port }}
+                    </p>
+
+                    <span class="badge bg-secondary mb-3">
+                        Current: {{ r.status }}
+                    </span>
+
+                    <!-- Status Form -->
+                    <form method="post"
+                          action="{% url 'LCompany:update_shipment_status' r.request_id %}">
+                        {% csrf_token %}
+
+                        <select name="status" class="form-select mb-2">
+                            <option>Started</option>
+                            <option>On Transit</option>
+                            <option>completed</option>
+                        </select>
+
+                        <button class="btn btn-warning w-100">
+                            Update Status
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No shipments found</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

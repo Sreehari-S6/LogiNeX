@@ -1,0 +1,54 @@
+{% extends "indexnav.html" %}
+{% load static %}
+
+{% block main %}
+
+<!-- Header -->
+<div class="container-fluid page-header py-5 mb-5"
+     style="background: linear-gradient(rgba(6,3,21,.7), rgba(6,3,21,.7)),
+     url('{% static "index_style/img/carousel-1.jpg" %}') center center no-repeat;
+     background-size: cover;">
+    <div class="container py-5 text-center">
+        <h1 class="display-3 text-white">Ocean Transport Service</h1>
+        <p class="text-white fs-5">Sea Cargo Solutions by ShipNex</p>
+    </div>
+</div>
+
+<!-- Service Section -->
+<div class="container-xxl py-5">
+    <div class="container text-center">
+
+        <h6 class="text-secondary text-uppercase">Our Core Service</h6>
+        <h1 class="mb-4">Ocean Freight Only</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+
+                <div class="service-item p-4 shadow rounded">
+
+                    <img class="img-fluid mb-4"
+                         src="{% static 'index_style/img/carousel-1.jpg' %}"
+                         alt="Ocean Freight">
+
+                    <h4>Ocean Cargo Transport</h4>
+
+                    <p>
+                        ShipNex provides dedicated ocean freight transportation
+                        with ship scheduling, container allocation, cargo booking,
+                        and sea route tracking — all in one platform.
+                    </p>
+
+                    <a href="{% url 'login' %}"
+                       class="btn btn-primary mt-3">
+                       Book Shipment
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

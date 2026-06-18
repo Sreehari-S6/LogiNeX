@@ -1,0 +1,70 @@
+{% extends "company_navbar.html" %}
+{% block title %}Manage Ships{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 text-yellow mb-2">Manage Ships</h1>
+            <p class="text-gray">View and manage your fleet</p>
+        </div>
+        <a href="{% url 'LCompany:add_ship' %}" class="btn btn-yellow">
+            <i class="bi bi-plus-circle me-2"></i>Add Ship
+        </a>
+    </div>
+
+    <!-- Ships Cards -->
+    <div class="row g-4">
+
+        {% for ship in ships %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card ship-card h-100 shadow-sm">
+
+                <!-- Ship Image -->
+                <img 
+                    src="{{ ship.image.url }}" 
+                    class="card-img-top"
+                    style="height: 180px; object-fit: cover;"
+                    alt="Ship Image"
+                >
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <h5 class="card-title text-yellow">
+                        {{ ship.ship_name }}
+                    </h5>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Capacity:</strong> {{ ship.capacity_ton }} Ton
+                    </p>
+
+                    <p class="mb-1 text-gray">
+                        <strong>Built Year:</strong> {{ ship.built_year }}
+                    </p>
+
+                    <span class="badge bg-warning text-dark mt-2">
+                        {{ ship.status }}
+                    </span>
+                </div>
+
+                <!-- Card Footer (optional actions) -->
+                <div class="card-footer bg-transparent border-0 text-end">
+                    <a href="#" class="btn btn-sm btn-outline-warning">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No ships added yet</p>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
