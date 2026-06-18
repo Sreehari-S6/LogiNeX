@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
-    "loginex-transport.up.railway.app",
+    "shipnex-transports.up.railway.app",
 ]
 
 
@@ -141,7 +141,7 @@ USE_I18N = True
 USE_TZ = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://loginex-transport.up.railway.app",
+    "https://shipnex-transports.up.railway.app/",
 ]
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
