@@ -1,1 +1,1 @@
-web: gunicorn LogisticsManagement.wsgigit add Procfile
+web: gunicorn LogisticsManagement.wsgi
