@@ -84,6 +84,11 @@ WSGI_APPLICATION = 'LogisticsManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+print("PGHOST =", os.getenv("PGHOST"))
+print("PGDATABASE =", os.getenv("PGDATABASE"))
+print("PGUSER =", os.getenv("PGUSER"))
+print("PGPORT =", os.getenv("PGPORT"))
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
