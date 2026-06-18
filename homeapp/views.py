@@ -10,7 +10,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import timedelta
-
+import traceback
 from .models import tbl_login, tbl_otp
 
 
@@ -81,55 +81,60 @@ def login(request):
 
         print("LOGIN ATTEMPT:", email)
 
-        # STEP 1: Check email exists
         try:
-            user = tbl_login.objects.get(email=email)
-        except tbl_login.DoesNotExist:
-            print("EMAIL NOT FOUND")
-            messages.error(request, "Email not registered")
-            return render(request, "login.html", {"form": form})
+            # STEP 1: Check email exists
+            try:
+                user = tbl_login.objects.get(email=email)
+            except tbl_login.DoesNotExist:
+                print("EMAIL NOT FOUND")
+                messages.error(request, "Email not registered")
+                return render(request, "login.html", {"form": form})
 
-        # STEP 2: Check password
-        if user.password != password:
-            print("WRONG PASSWORD")
-            messages.error(request, "Incorrect password")
-            return render(request, "login.html", {"form": form})
+            # STEP 2: Check password
+            if user.password != password:
+                print("WRONG PASSWORD")
+                messages.error(request, "Incorrect password")
+                return render(request, "login.html", {"form": form})
 
-        # STEP 3: Success → set session
-        request.session.clear()
-        request.session["login_id"] = user.id
-        request.session["email"] = user.email
-        request.session["usertype"] = user.usertype
+            # STEP 3: Success → set session
+            request.session.clear()
+            request.session["login_id"] = user.id
+            request.session["email"] = user.email
+            request.session["usertype"] = user.usertype
 
-        print("LOGIN SUCCESS:", user.email, user.usertype)
-        
-        try:
+            print("LOGIN SUCCESS:", user.email, user.usertype)
+
+            try:
                 company = tbl_company.objects.get(login_id=user.id)
                 request.session["company_id"] = company.id
                 request.session["company_name"] = company.name
                 request.session["company_status"] = company.status
                 print(f"Company found: {company.name}, Status: {company.status}")
-        except tbl_company.DoesNotExist:
+            except tbl_company.DoesNotExist:
                 print("Company profile not found")
-                messages.warning(request, "Company profile not found. Contact admin.")
 
-        # STEP 4: Redirect
-        if user.usertype == "admin":
-            return redirect("LAdmin:admin_dashboard")     
-        elif user.usertype == "user":
-            return redirect("LUser:user_dashboard")      
-        elif user.usertype == "company":
-            return redirect("LCompany:Company_Dashboard")
+            # STEP 4: Redirect
+            if user.usertype == "admin":
+                return redirect("LAdmin:admin_dashboard")
+            elif user.usertype == "user":
+                return redirect("LUser:user_dashboard")
+            elif user.usertype == "company":
+                return redirect("LCompany:Company_Dashboard")
 
-        # Safety fallback
-        messages.error(request, "Invalid user role")
-        return render(request, "login.html", {"form": form})
+            messages.error(request, "Invalid user role")
+            return render(request, "login.html", {"form": form})
+
+        except Exception as e:
+            print("=" * 60)
+            print("LOGIN ERROR:", e)
+            traceback.print_exc()
+            print("=" * 60)
+            raise
 
     else:
         form = LoginForm()
 
     return render(request, "login.html", {"form": form})
-
 def logout(request):
     """
     Handle user logout
